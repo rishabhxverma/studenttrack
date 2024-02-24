@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0-alpha-1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .student {
+            border: 2px solid black;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+            display: inline-block;
+        }
+        .student__name {
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+<main class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <h1>STUDENTS</h1>
+            <ul>
+                <li th:each="student : ${stu}">
+                    <div th:class="'student'" th:style="'width:' + ${student.weight * 2} + 'px; height:' + ${student.height * 2} + 'px; border-color:' + ${student.hairColor}">
+                        <span class="student__name" th:text="${student.name}" th:class="${student.gpa >= 4} ? 'bold'"></span> <br>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+</body>
+</html>
