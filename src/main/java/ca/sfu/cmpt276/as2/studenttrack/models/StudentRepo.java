@@ -7,5 +7,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface StudentRepo extends JpaRepository<Student,Integer> {
     List<Student> findByName(String name);
     Student findById(int sid);
-    void deleteAllById(int sid);
 }

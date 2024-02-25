@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
+
 
 import ca.sfu.cmpt276.as2.studenttrack.models.Student;
 import ca.sfu.cmpt276.as2.studenttrack.models.StudentRepo;
@@ -56,39 +55,42 @@ public class StudentController {
     }
 
     @PostMapping("/student/update")
-    public ResponseEntity<String> updateStudent(@RequestParam("id") int id, @RequestBody Map<String, String> updatedStudentInfo) {
+    public ResponseEntity<String> updateStudent(@RequestParam("studentId") int studentId,
+                                                @RequestParam("name") String name,
+                                                @RequestParam("weight") int weight,
+                                                @RequestParam("height") int height,
+                                                @RequestParam("hairColor") String hairColor,
+                                                @RequestParam("gpa") double gpa) {
         // Find the student by id
-        Student student = studentRepo.findById(id);
+        Student student = studentRepo.findById(studentId);
         if (student == null) {
             return new ResponseEntity<>("Student not found", HttpStatus.NOT_FOUND);
         }
-
+    
         // Update student information
-        if (updatedStudentInfo.containsKey("name")) {
-            student.setName(updatedStudentInfo.get("name"));
-        }
-        if (updatedStudentInfo.containsKey("weight")) {
-            student.setWeight(Integer.parseInt(updatedStudentInfo.get("weight")));
-        }
-        if (updatedStudentInfo.containsKey("height")) {
-            student.setHeight(Integer.parseInt(updatedStudentInfo.get("height")));
-        }
-        if (updatedStudentInfo.containsKey("hairColor")) {
-            student.setHairColor(updatedStudentInfo.get("hairColor"));
-        }
-        if (updatedStudentInfo.containsKey("gpa")) {
-            student.setGpa(Double.parseDouble(updatedStudentInfo.get("gpa")));
-        }
-
+        student.setName(name);
+        student.setWeight(weight);
+        student.setHeight(height);
+        student.setHairColor(hairColor);
+        student.setGpa(gpa);
+    
         // Save the updated student
         studentRepo.save(student);
-
+    
         return new ResponseEntity<>("Student updated successfully", HttpStatus.OK);
     }
-
-    @DeleteMapping("/student/delete")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteStudentByID(@RequestParam int sid) {
-        studentRepo.deleteAllById(sid);
+    
+    @DeleteMapping("/student/delete/{id}")
+    public ResponseEntity<String> deleteStudent(@PathVariable("id") int id) {
+        // Find the student by id
+        Student student = studentRepo.findById(id);
+        if (student != null) {
+            // Delete the student
+            studentRepo.delete(student);
+            return new ResponseEntity<>("Student deleted successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Student not found", HttpStatus.NOT_FOUND);
+        }
     }
+
 }

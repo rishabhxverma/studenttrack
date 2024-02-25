@@ -1,77 +1,168 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Student Information</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0-alpha-1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .student-container {
-            display: flex;
-        }
         .student {
             border: 2px solid black;
             margin-bottom: 10px;
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
-            flex-grow: 1;
         }
+
         .student__name {
             font-style: normal;
         }
-        .modal-container {
-            flex-basis: 300px; /* Adjust the width as needed */
-            border: 2px solid black;
+
+        .student-info {
+            margin-left: 20px;
             padding: 10px;
-            display: flex;
-            flex-direction: column;
-            margin-right: 20px; /* Adjust the margin as needed */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: inline-block;
+            width: 320px;
         }
-        .modal-title {
-            font-weight: bold;
+
+        .student-info input[type="text"] {
+            width: 100%;
             margin-bottom: 10px;
+            padding: 5px;
         }
     </style>
 </head>
+
 <body>
-<main class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-4">
-            <h1>STUDENTS</h1>
-            <div class="student-container">
-                <div class="modal-container">
-                    <div class="modal-title">Student Details</div>
-                    <form>
-                        <label for="name">Name:</label>
-                        <input type="text" id="name" name="name"><br>
-                        <label for="weight">Weight:</label>
-                        <input type="number" id="weight" name="weight"><br>
-                        <label for="height">Height:</label>
-                        <input type="number" id="height" name="height"><br>
-                        <label for="hairColor">Hair Color:</label>
-                        <input type="text" id="hairColor" name="hairColor"><br>
-                        <label for="gpa">GPA:</label>
-                        <input type="text" id="gpa" name="gpa"><br>
-                    </form>
-                </div>
+    <main class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <h1>STUDENTS</h1>
+                <!-- Add Student button -->
+                <button type="button" onclick="openAddStudentPage()">Add Student</button>
                 <ul>
                     <li th:each="student : ${stu}">
-                        <div class="student"
-                             th:class="'student'"
-                             th:style="'width:' + ${student.weight * 2} + 'px; height:' + ${student.height * 2} + 'px; border-color:' + ${student.hairColor}"
-                             onclick= "document.getElementById('name').value = '${student.name}';
-                                        document.getElementById('weight').value = '${student.weight}';
-                                        document.getElementById('height').value = '${student.height}';
-                                        document.getElementById('hairColor').value = '${student.hairColor}';
-                                        document.getElementById('gpa').value = '${student.gpa}';">
-                            <span class="student__name" th:text="${student.name}" th:class="${student.gpa >= 4} ? 'bold'"></span> <br>
+                        <div class="student" th:class="'student'" th:attr="student-id=${student.id}"
+                            onclick="getStudentInfo(student-id)"
+                            th:style="'width:' + ${student.weight} + 'px; height:' + ${student.height * 2} + 'px; border-color:' + ${student.hairColor}">
+                            <span class="student__name" th:text="${student.name}"
+                                th:class="${student.gpa >= 4} ? 'bold'"></span>
                         </div>
                     </li>
                 </ul>
             </div>
+            <div class="col-md-4">
+                <div class="student-info" id="studentInfo">
+                    <h2>Student Information</h2>
+                    <form id="studentForm">
+                        <input type="hidden" id="studentId" name="studentId">
+
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name"><br>
+
+                        <label for="weight">Weight:</label>
+                        <input type="text" id="weight" name="weight"><br>
+
+                        <label for="height">Height:</label>
+                        <input type="text" id="height" name="height"><br>
+
+                        <label for="hairColor">Hair Color:</label>
+                        <input type="text" id="hairColor" name="hairColor"><br>
+
+                        <label for="gpa">GPA:</label>
+                        <input type="text" id="gpa" name="gpa"><br>
+                        <button type="button" onclick="saveChanges()">Save Changes</button>
+                        <button type="button" onClick="deleteStudent()">Delete Student</button>
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
-</main>
+    </main>
+
+    <script>
+        // JavaScript function to open the "Add Student" page in a new tab
+        function openAddStudentPage() {
+            // Redirect the user to add.html in a new tab
+            window.open('/add.html', '_blank');
+        }
+        function getStudentInfo(studentId) {
+            fetch(`/student/${studentId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch student information');
+                    }
+                    return response.json();
+                })
+                .then(student => {
+                    // Populate student information in the form
+                    document.getElementById('studentId').value = student.id;
+                    document.getElementById('name').value = student.name;
+                    document.getElementById('weight').value = student.weight;
+                    document.getElementById('height').value = student.height;
+                    document.getElementById('hairColor').value = student.hairColor;
+                    document.getElementById('gpa').value = student.gpa;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        function saveChanges() {
+            // Get form data
+            const formData = new FormData(document.getElementById('studentForm'));
+            // Send POST request to update student information
+            fetch('/student/update', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to save changes');
+                    }
+                    // Optionally, display a success message or update UI
+                    console.log('Changes saved successfully');
+                    window.location.reload();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        // Add event listener to each student div
+        document.querySelectorAll('.student').forEach(studentDiv => {
+            studentDiv.addEventListener('click', function () {
+                // Get student ID from data attribute
+                const studentId = this.getAttribute('student-id');
+                // Call getStudentInfo function with the student ID
+                getStudentInfo(studentId);
+            });
+        });
+        // JavaScript function to delete the selected student
+        function deleteStudent() {
+            // Get the student ID from the hidden input field
+            var studentId = document.getElementById('studentId').value;
+
+            // Send a DELETE request to the server
+            fetch('/student/delete/' + studentId, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If deletion is successful, reload the page to reflect changes
+                        location.reload();
+                    } else {
+                        // If deletion fails, display an error message
+                        console.error('Error deleting student');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting student:', error);
+                });
+        }
+    </script>
 </body>
+
 </html>
