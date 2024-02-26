@@ -9,10 +9,11 @@
     <style>
         .student {
             border: 2px solid black;
-            margin-bottom: 10px;
+            margin: 10px;
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
+            display: inline-block;
         }
 
         .student__name {
@@ -20,11 +21,10 @@
         }
 
         .student-info {
-            margin-left: 20px;
+            margin-right: 20px; 
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            display: inline-block;
             width: 320px;
         }
 
@@ -33,27 +33,21 @@
             margin-bottom: 10px;
             padding: 5px;
         }
+
+        .student-container {
+            display: flex; 
+            flex-wrap: wrap; 
+        }
+
+        .student-wrapper {
+            margin-right: 20px; 
+        }
     </style>
 </head>
 
 <body>
     <main class="container-fluid">
         <div class="row justify-content-center">
-            <div class="col-md-4">
-                <h1>STUDENTS</h1>
-                <!-- Add Student button -->
-                <button type="button" onclick="openAddStudentPage()">Add Student</button>
-                <ul>
-                    <li th:each="student : ${stu}">
-                        <div class="student" th:class="'student'" th:attr="student-id=${student.id}"
-                            onclick="getStudentInfo(student-id)"
-                            th:style="'width:' + ${student.weight} + 'px; height:' + ${student.height * 2} + 'px; border-color:' + ${student.hairColor}">
-                            <span class="student__name" th:text="${student.name}"
-                                th:class="${student.gpa >= 4} ? 'bold'"></span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
             <div class="col-md-4">
                 <div class="student-info" id="studentInfo">
                     <h2>Student Information</h2>
@@ -79,15 +73,32 @@
                     </form>
                 </div>
             </div>
+            <div class="col-md-8">
+                <h1>STUDENTS</h1>
+                <!-- Add Student button -->
+                <button type="button" onclick="openAddStudentPage()">Add Student</button>
+                <div class="student-container">
+                    <div class="student-wrapper" th:each="student : ${stu}">
+                        <div class="student" th:class="'student'" th:attr="student-id=${student.id}"
+                            onclick="getStudentInfo(student-id)"
+                            th:style="'width:' + ${student.weight} + 'px; height:' + ${student.height * 2} + 'px; border-color:' + ${student.hairColor}">
+                            <span class="student__name" th:text="${student.name}"
+                                th:class="${student.gpa >= 4} ? 'bold'"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        // JavaScript function to open the "Add Student" page in a new tab
+
         function openAddStudentPage() {
             // Redirect the user to add.html in a new tab
             window.open('/add.html', '_blank');
         }
+
+        //gets student info of the student being clicked on
         function getStudentInfo(studentId) {
             fetch(`/student/${studentId}`)
                 .then(response => {
@@ -140,7 +151,7 @@
                 getStudentInfo(studentId);
             });
         });
-        // JavaScript function to delete the selected student
+        
         function deleteStudent() {
             // Get the student ID from the hidden input field
             var studentId = document.getElementById('studentId').value;
