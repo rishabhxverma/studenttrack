@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -75,7 +76,7 @@
             </div>
             <div class="col-md-8">
                 <h1>STUDENTS</h1>
-                <!-- Add Student button -->
+
                 <button type="button" onclick="openAddStudentPage()">Add Student</button>
                 <div class="student-container">
                     <div class="student-wrapper" th:each="student : ${stu}">
@@ -151,7 +152,7 @@
                 getStudentInfo(studentId);
             });
         });
-        
+
         function deleteStudent() {
             // Get the student ID from the hidden input field
             var studentId = document.getElementById('studentId').value;

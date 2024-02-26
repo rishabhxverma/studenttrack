@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 import ca.sfu.cmpt276.as2.studenttrack.models.Student;
 import ca.sfu.cmpt276.as2.studenttrack.models.StudentRepo;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,18 +24,18 @@ public class StudentController {
     private StudentRepo studentRepo;
 
     @GetMapping("/student/view")
-    public String getAllStudents(Model model){
+    public String getAllStudents(Model model) {
         List<Student> students = studentRepo.findAll();
         model.addAttribute("stu", students);
         return "student/showAll";
     }
 
     @PostMapping("/student/add")
-    public String addStudent(@RequestParam Map<String, String> newStudent, HttpServletResponse response){
+    public String addStudent(@RequestParam Map<String, String> newStudent, HttpServletResponse response) {
         System.out.println("ADD user");
         String newName = newStudent.get("name");
         int newWeight = Integer.parseInt(newStudent.get("weight"));
-        int newHeight =  Integer.parseInt(newStudent.get("height"));
+        int newHeight = Integer.parseInt(newStudent.get("height"));
         String newHairColor = newStudent.get("hairColor");
         Double newGPA = Double.parseDouble(newStudent.get("gpa"));
         studentRepo.save(new Student(newName, newWeight, newHeight, newHairColor, newGPA));
@@ -56,30 +55,30 @@ public class StudentController {
 
     @PostMapping("/student/update")
     public ResponseEntity<String> updateStudent(@RequestParam("studentId") int studentId,
-                                                @RequestParam("name") String name,
-                                                @RequestParam("weight") int weight,
-                                                @RequestParam("height") int height,
-                                                @RequestParam("hairColor") String hairColor,
-                                                @RequestParam("gpa") double gpa) {
+            @RequestParam("name") String name,
+            @RequestParam("weight") int weight,
+            @RequestParam("height") int height,
+            @RequestParam("hairColor") String hairColor,
+            @RequestParam("gpa") double gpa) {
         // Find the student by id
         Student student = studentRepo.findById(studentId);
         if (student == null) {
             return new ResponseEntity<>("Student not found", HttpStatus.NOT_FOUND);
         }
-    
+
         // Update student information
         student.setName(name);
         student.setWeight(weight);
         student.setHeight(height);
         student.setHairColor(hairColor);
         student.setGpa(gpa);
-    
+
         // Save the updated student
         studentRepo.save(student);
-    
+
         return new ResponseEntity<>("Student updated successfully", HttpStatus.OK);
     }
-    
+
     @DeleteMapping("/student/delete/{id}")
     public ResponseEntity<String> deleteStudent(@PathVariable("id") int id) {
         // Find the student by id
